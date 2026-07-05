@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
-const ASSETS = '../assets';
+const ASSETS = 'assets';
 
 const DESIGN_H = 900;          // virtual design height; everything scales from it
 const WALK_SPEED = 320;        // player speed, design px / second
