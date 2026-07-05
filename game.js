@@ -36,23 +36,20 @@ function loadImage(src) {
   });
 }
 
-// Animation folders may be re-populated with a different number of frames /
-// different starting index at any time. We can't list a directory from the
-// browser, so probe the numeric filename space and keep whatever exists,
-// in filename order. (Missing probes 404 quietly and are skipped.)
-const FRAME_PROBE_MAX = 200; // probes 0000.png .. 0199.png
+// Frame ranges must match the files in assets/animations/<folder>/.
+const ANIM_RANGES = {
+  idle: { first: 14, last: 85 }, // 0014.png .. 0085.png
+  walk: { first: 13, last: 68 }, // 0013.png .. 0068.png
+};
 
-async function discoverFrames(folder) {
+function loadFrames(folder) {
+  const { first, last } = ANIM_RANGES[folder];
   const attempts = [];
-  for (let i = 0; i < FRAME_PROBE_MAX; i++) {
+  for (let i = first; i <= last; i++) {
     const name = String(i).padStart(4, '0') + '.png';
-    attempts.push(
-      loadImage(`${ASSETS}/animations/${folder}/${name}`).catch(() => null)
-    );
+    attempts.push(loadImage(`${ASSETS}/animations/${folder}/${name}`));
   }
-  const frames = (await Promise.all(attempts)).filter(Boolean);
-  if (frames.length === 0) throw new Error('No frames found for "' + folder + '"');
-  return frames;
+  return Promise.all(attempts);
 }
 
 // ---------------------------------------------------------------------------
@@ -246,8 +243,8 @@ async function boot() {
       loadImage(`${ASSETS}/static/btn-left-pressed.png`),
       loadImage(`${ASSETS}/static/btn-right-normal.png`),
       loadImage(`${ASSETS}/static/btn-right-pressed.png`),
-      discoverFrames('idle'),
-      discoverFrames('walk'),
+      loadFrames('idle'),
+      loadFrames('walk'),
     ]);
     assets = { far, mid, ground, banner, btnLeft, btnLeftPressed, btnRight, btnRightPressed, anims: { idle, walk } };
   } catch (err) {
