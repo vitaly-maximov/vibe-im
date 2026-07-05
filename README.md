@@ -1,0 +1,1 @@
+Simple project to try vibe coding games
